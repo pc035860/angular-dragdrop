@@ -11,7 +11,7 @@ angular.module("ngDragDrop",[])
         '$rootScope',
         function ($parse, $rootScope) {
             return function (scope, element, attrs) {
-                var dragStartClass = attr.dragStartClass || "on-drag-start";
+                var dragStartClass = attrs.dragStartClass || "on-drag-start";
 
                 if (window.jQuery && !window.jQuery.event.props.dataTransfer) {
                     window.jQuery.event.props.push('dataTransfer');
@@ -67,10 +67,10 @@ angular.module("ngDragDrop",[])
         '$parse',
         '$rootScope',
         function ($parse, $rootScope) {
-            return function (scope, element, attr) {
+            return function (scope, element, attrs) {
                 var dropChannel = "defaultchannel";
                 var dragChannel = "";
-                var dragEnterClass = attr.dragEnterClass || "on-drag-enter";
+                var dragEnterClass = attrs.dragEnterClass || "on-drag-enter";
 
                 var deregisterNgDragStart, deregisterNgDragEnd;
 
@@ -96,7 +96,7 @@ angular.module("ngDragDrop",[])
                     }
                     var data = e.dataTransfer.getData("Text");
                     data = angular.fromJson(data);
-                    var fn = $parse(attr.uiOnDrop);
+                    var fn = $parse(attrs.uiOnDrop);
                     scope.$apply(function () {
                         fn(scope, {$data: data, $event: e});
                     });
@@ -130,7 +130,7 @@ angular.module("ngDragDrop",[])
                 });
 
 
-                attr.$observe('dropChannel', function (value) {
+                attrs.$observe('dropChannel', function (value) {
                     if (value) {
                         dropChannel = value;
                     }
