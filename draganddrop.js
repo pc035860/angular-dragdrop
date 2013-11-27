@@ -11,6 +11,8 @@ angular.module("ngDragDrop",[])
         '$rootScope',
         function ($parse, $rootScope) {
             return function (scope, element, attrs) {
+                var dragStartClass = attr.dragStartClass || "on-drag-start";
+
                 if (window.jQuery && !window.jQuery.event.props.dataTransfer) {
                     window.jQuery.event.props.push('dataTransfer');
                 }
@@ -28,6 +30,7 @@ angular.module("ngDragDrop",[])
                     e.dataTransfer.setData("Text", sendData);
                     $rootScope.$broadcast("ANGULAR_DRAG_START", sendChannel);
 
+                    element.addClass(dragStartClass);
                 });
 
                 //For IE
@@ -47,9 +50,16 @@ angular.module("ngDragDrop",[])
                             });
                         }
                     }
+
+                    element.removeClass(dragStartClass);
                 });
 
-
+                element.bind('$destory', function () {
+                    angular.forEach(['dragstart', 'dragend', 'selectstart'], function (name) {
+                        element.unbind(name);
+                    });
+                    element.unbind('$destory');
+                });
             };
         }
     ])
@@ -61,6 +71,8 @@ angular.module("ngDragDrop",[])
                 var dropChannel = "defaultchannel";
                 var dragChannel = "";
                 var dragEnterClass = attr.dragEnterClass || "on-drag-enter";
+
+                var deregisterNgDragStart, deregisterNgDragEnd;
 
                 function onDragOver(e) {
 
@@ -92,7 +104,7 @@ angular.module("ngDragDrop",[])
                 }
 
 
-                $rootScope.$on("ANGULAR_DRAG_START", function (event, channel) {
+                deregisterNgDragStart = $rootScope.$on("ANGULAR_DRAG_START", function (event, channel) {
                     dragChannel = channel;
                     if (dropChannel === channel) {
 
@@ -106,7 +118,7 @@ angular.module("ngDragDrop",[])
 
 
 
-                $rootScope.$on("ANGULAR_DRAG_END", function (e, channel) {
+                deregisterNgDragEnd = $rootScope.$on("ANGULAR_DRAG_END", function (e, channel) {
                     dragChannel = "";
                     if (dropChannel === channel) {
 
@@ -124,7 +136,12 @@ angular.module("ngDragDrop",[])
                     }
                 });
 
+                element.bind('$destory', function () {
+                    (deregisterNgDragStart || angular.noop)();
+                    (deregisterNgDragEnd || angular.noop)();
 
+                    element.unbind('$destory');
+                });
             };
         }
     ]);
