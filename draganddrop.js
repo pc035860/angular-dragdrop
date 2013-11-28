@@ -76,9 +76,18 @@ angular.module("ngDragDrop",[])
             return function (scope, element, attrs) {
                 var dropChannel = "defaultchannel";
                 var dragChannel = "";
-                var dragEnterClass = attrs.dragEnterClass || "on-drag-enter";
+                var dragAcceptClass = attrs.dragAcceptClass || "on-drag-accept";
+                var dragOverClass = attrs.dragOverClass || "on-drag-over";
 
                 var deregisterNgDragStart, deregisterNgDragEnd;
+
+                function onDragEnter(e) {
+                    element.addClass(dragOverClass);
+                }
+
+                function onDragLeave(e) {
+                    element.removeClass(dragOverClass);
+                }
 
                 function onDragOver(e) {
 
@@ -113,16 +122,21 @@ angular.module("ngDragDrop",[])
 
                 function enterDropAcceptancePhase () {
                     element.bind("dragover", onDragOver);
+                    element.bind("dragenter", onDragEnter);
+                    element.bind("dragleave", onDragLeave);
 
                     element.bind("drop", onDrop);
-                    element.addClass(dragEnterClass);
+                    element.addClass(dragAcceptClass);
                 }
 
                 function leaveDropAcceptancePhase () {
                     element.unbind("dragover", onDragOver);
+                    element.unbind("dragenter", onDragEnter);
+                    element.unbind("dragleave", onDragLeave);
 
                     element.unbind("drop", onDrop);
-                    element.removeClass(dragEnterClass);
+                    element.removeClass(dragAcceptClass);
+                    onDragLeave();
                 }
 
                 deregisterNgDragStart = scope.$on("ngDragDrop.dragstart", function (event, channel) {
