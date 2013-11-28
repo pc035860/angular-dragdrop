@@ -16,14 +16,17 @@ angular.module("ngDragDrop",[])
                 if (window.jQuery && !window.jQuery.event.props.dataTransfer) {
                     window.jQuery.event.props.push('dataTransfer');
                 }
-                element.attr("draggable", false);
-                attrs.$observe("uiDraggable", function (newValue) {
-                    element.attr("draggable", newValue);
+
+                element.prop("draggable", false);
+                scope.$watch(attrs.uiDraggable, function (val) {
+                    element.prop("draggable", val);
                 });
+
                 var dragData = "";
-                scope.$watch(attrs.drag, function (newValue) {
-                    dragData = newValue;
+                scope.$watch(attrs.drag, function (val) {
+                    dragData = val;
                 }, true);
+
                 element.bind("dragstart", function (e) {
                     var sendData = angular.toJson(dragData);
                     var sendChannel = attrs.dragChannel || "defaultchannel";
@@ -35,7 +38,10 @@ angular.module("ngDragDrop",[])
 
                 //For IE
                 element.bind("selectstart",function() {
-                    this.dragDrop();
+                    try {
+                        this.dragDrop();
+                    }
+                    catch(e) {}
                     return false;
                 }, false);
 
